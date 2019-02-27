@@ -6,11 +6,11 @@ namespace SValid.Core
 
     public readonly struct Result<TOk, TError>
     {
-        public ResultTag Outcome { get; }
+        public readonly ResultTag Outcome;
 
-        public TOk Ok { get; }
+        public readonly TOk Ok;
 
-        public TError Error { get; }
+        public readonly TError Error;
 
         private Result(ResultTag outcome, in TOk ok, in TError error)
         {
