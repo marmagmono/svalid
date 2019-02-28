@@ -29,29 +29,11 @@ namespace SValid.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Result<TOk, List<TError>> Merge<TOk, TError>(
             in this Result<TOk, TError> res1,
-            in Result<TOk, TError> res2)
-        {
-            if (res1.IsOk() && res2.IsOk())
-                return Result<TOk, List<TError>>.CreateOk(res1.Ok);
-            else if (res1.IsOk() && res2.IsError())
-                return Result<TOk, List<TError>>.CreateError(new List<TError>() { res2.Error });
-            else if (res1.IsError() && res2.IsOk())
-                return Result<TOk, List<TError>>.CreateError(new List<TError>() { res1.Error });
-            else return Result<TOk, List<TError>>.CreateError(new List<TError>() { res1.Error, res2.Error });
-        }
+            in Result<TOk, TError> res2) => res1 & res2;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Result<TOk, List<TError>> Merge<TOk, TError>(
             in this Result<TOk, List<TError>> res1,
-            in Result<TOk, TError> res2)
-        {
-            if (res1.IsOk() && res2.IsOk())
-                return res1;
-            else if (res1.IsOk() && res2.IsError())
-                return Result<TOk, List<TError>>.CreateError(new List<TError>() { res2.Error });
-            else if (res1.IsError() && res2.IsOk())
-                return Result<TOk, List<TError>>.CreateError(new List<TError>(res1.Error));
-            else return Result<TOk, List<TError>>.CreateError(new List<TError>(res1.Error) { res2.Error });
-        }
+            in Result<TOk, TError> res2) => res1 & res2;
     }
 }

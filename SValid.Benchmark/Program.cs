@@ -67,18 +67,18 @@ namespace SValid.Benchmark
 
                 var validatedFirstProp =
                     firstPropValue.NotEmpty()
-                        .Merge(firstPropValue.MinLength(3))
-                        .Merge(firstPropValue.MaxLength(100));
+                    & firstPropValue.MinLength(3)
+                    & firstPropValue.MaxLength(100);
 
                 var validatedSecondProp =
                     secondPropValue.NotEmpty()
-                        .Merge(secondPropValue.MinLength(3))
-                        .Merge(secondPropValue.MaxLength(100));
+                    & secondPropValue.MinLength(3)
+                    & secondPropValue.MaxLength(100);
 
                 var validatedThirdProp =
                     thirdPropValue.NotEmpty()
-                        .Merge(thirdPropValue.MinLength(3))
-                        .Merge(thirdPropValue.MaxLength(100));
+                    & thirdPropValue.MinLength(3)
+                    & thirdPropValue.MaxLength(100);
 
                 if (validatedFirstProp.IsOk()
                     && validatedSecondProp.IsOk()
