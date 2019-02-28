@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace SValid.Core
 {
@@ -26,5 +27,10 @@ namespace SValid.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Result<TOk, TError> CreateError(in TError error) =>
             new Result<TOk, TError>(ResultTag.Error, default, error);
+
+        public static implicit operator Result<TOk, List<TError>>(in Result<TOk, TError> res) =>
+            res.IsOk() ?
+                Result<TOk, List<TError>>.CreateOk(res.Ok)
+                : Result<TOk, List<TError>>.CreateError(new List<TError>() { res.Error });
     }
 }

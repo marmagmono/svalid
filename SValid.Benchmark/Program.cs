@@ -87,6 +87,36 @@ namespace SValid.Benchmark
 
                 throw new InvalidOperationException();
             }
+
+            [Benchmark]
+            public SimpleClass BoringClassic()
+            {
+                var firstPropValue = "someValue";
+                var secondPropValue = "someOtherValue";
+                var thirdPropValue = "yetAnotherValue";
+
+                bool isFirstOk =
+                    !string.IsNullOrEmpty(firstPropValue)
+                    && firstPropValue.Length >= 3
+                    && firstPropValue.Length <= 100;
+
+                bool isSecondOk =
+                    !string.IsNullOrEmpty(secondPropValue)
+                    && secondPropValue.Length >= 3
+                    && secondPropValue.Length <= 100;
+
+                bool isThirdOk =
+                    !string.IsNullOrEmpty(thirdPropValue)
+                    && thirdPropValue.Length >= 3
+                    && thirdPropValue.Length <= 100;
+
+                if (isFirstOk
+                    && isSecondOk
+                    && isThirdOk)
+                    return new SimpleClass(firstPropValue, secondPropValue, thirdPropValue);
+
+                throw new InvalidOperationException();
+            }
         }
 
         static void Main(string[] args)
