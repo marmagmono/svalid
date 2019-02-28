@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace SValid.Core.StringValidation
 {
@@ -10,6 +11,7 @@ namespace SValid.Core.StringValidation
         public const string TooShortErrorCode = "E1001:TooShort";
         public const string TooLongErrorCode = "E1002:TooLong";
         public const string InvalidLengthErrorCode = "E1003:InvalidLength";
+        public const string NoMatchErrorCode = "E1003:NoMatch:{0}";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static StringValidationResult NotEmpty(
@@ -53,6 +55,17 @@ namespace SValid.Core.StringValidation
             return s?.Length > maxLength || s?.Length < minLength ?
                 StringValidationResult.CreateError(errorCode)
                 : StringValidationResult.CreateOk(s);
+        }
+
+        public static StringValidationResult Matches(
+            this string s,
+            string regExp,
+            string errorCodeTemplate = NoMatchErrorCode)
+        {
+            var m = Regex.Match(s, regExp);
+            return m.Success ?
+                StringValidationResult.CreateOk(s)
+                : StringValidationResult.CreateError(string.Format(errorCodeTemplate, regExp));
         }
     }
 }

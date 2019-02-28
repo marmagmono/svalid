@@ -137,5 +137,34 @@ namespace SValid.Core.Tests.StringValidation
             Assert.True(res.IsError());
             Assert.Equal(StringValidationExtensions.InvalidLengthErrorCode, res.Error);
         }
+
+        [Theory]
+        [InlineData("fggt", "ggt")]
+        [InlineData("Something", "S...t")]
+        public void Matches_Ok_IfMatchesPattern(string input, string pattern)
+        {
+            // Arrange
+
+            // Act
+            var res = input.Matches(pattern);
+
+            // Assert
+            Assert.True(res.IsOk());
+        }
+
+        [Theory]
+        [InlineData("fggt", "ggtyy")]
+        [InlineData("Something", "S...thyy")]
+        public void Matches_Error_IfDoesNotMatchPattern(string input, string pattern)
+        {
+            // Arrange
+
+            // Act
+            var res = input.Matches(pattern);
+
+            // Assert
+            Assert.True(res.IsError());
+            Assert.Equal(string.Format(StringValidationExtensions.NoMatchErrorCode, pattern), res.Error);
+        }
     }
 }
