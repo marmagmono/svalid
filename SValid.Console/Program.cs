@@ -7,7 +7,7 @@ namespace SValid.Console
 {
     class Program
     {
-        private class SimpleClass
+        private class SimpleClass : Exception
         {
             public string FirstProperty { get; }
             public string SecondProperty { get; }
@@ -26,27 +26,32 @@ namespace SValid.Console
 
         static void Main(string[] args)
         {
-            Result<Func<string, string, string, SimpleClass>, List<string>> Lift(Func<string, string, string, SimpleClass> f) =>
-                    Result<Func<string, string, string, SimpleClass>, List<string>>.CreateOk(f);
-
             var firstPropValue = "someValue";
             var secondPropValue = "someOtherValue";
             var thirdPropValue = "yetAnotherValue";
 
-            var liftedConstructor = Lift(SimpleClass.Create);
-            var result = liftedConstructor
-                .Apply(
-                    firstPropValue.NotEmpty()
-                    .Merge(firstPropValue.MinLength(3))
-                    .Merge(firstPropValue.MaxLength(100)))
-                .Apply(
-                    secondPropValue.NotEmpty()
-                    .Merge(secondPropValue.MinLength(3))
-                    .Merge(secondPropValue.MaxLength(100)))
-                .Apply(
-                    thirdPropValue.NotEmpty()
-                    .Merge(thirdPropValue.MinLength(3))
-                    .Merge(thirdPropValue.MaxLength(100)));
+            var validatedFirstProp =
+                firstPropValue.NotEmpty()
+                & firstPropValue.MinLength(3)
+                & firstPropValue.MaxLength(100)
+                & firstPropValue.MaxLength(300)
+                & firstPropValue.MaxLength(400)
+                & firstPropValue.MaxLength(500);
+
+            var validatedSecondProp =
+                secondPropValue.NotEmpty()
+                & secondPropValue.MinLength(3)
+                & secondPropValue.MaxLength(100);
+
+            var validatedThirdProp =
+                thirdPropValue.NotEmpty()
+                & thirdPropValue.MinLength(3)
+                & thirdPropValue.MaxLength(100);
+
+            if (validatedFirstProp.IsOk()
+                && validatedSecondProp.IsOk()
+                && validatedThirdProp.IsOk())
+                throw new SimpleClass(validatedFirstProp.Ok, validatedSecondProp.Ok, validatedThirdProp.Ok);
 
             System.Console.ReadKey();
         }
