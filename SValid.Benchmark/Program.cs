@@ -29,36 +29,6 @@ namespace SValid.Benchmark
         public class ValidationStylesTests
         {
             [Benchmark]
-            public SimpleClass ApplicativeStyle()
-            {
-                Result<Func<string, string, string, SimpleClass>, List<string>> Lift(Func<string, string, string, SimpleClass> f) =>
-                    Result<Func<string, string, string, SimpleClass>, List<string>>.CreateOk(f);
-
-                var firstPropValue = "someValue";
-                var secondPropValue = "someOtherValue";
-                var thirdPropValue = "yetAnotherValue";
-
-                var liftedConstructor = Lift(SimpleClass.Create);
-                var result = liftedConstructor
-                    .Apply(
-                        firstPropValue.NotEmpty()
-                        .Merge(firstPropValue.MinLength(3))
-                        .Merge(firstPropValue.MaxLength(100)))
-                    .Apply(
-                        secondPropValue.NotEmpty()
-                        .Merge(secondPropValue.MinLength(3))
-                        .Merge(secondPropValue.MaxLength(100)))
-                    .Apply(
-                        thirdPropValue.NotEmpty()
-                        .Merge(thirdPropValue.MinLength(3))
-                        .Merge(thirdPropValue.MaxLength(100)));
-
-                if (result.IsOk()) return result.Ok;
-
-                throw new InvalidOperationException();
-            }
-
-            [Benchmark]
             public SimpleClass HandmadeApplicativeStyle()
             {
                 var firstPropValue = "someValue";
@@ -123,18 +93,6 @@ namespace SValid.Benchmark
             [Benchmark]
             public SimpleClass HandmadeApplicativeStyleVariationWithFunction()
             {
-                T CreateValidated<T, TArg1, TArg2, TArg3>(
-                    CreateFunc<T, TArg1, TArg2, TArg3> create,
-                    in Result<TArg1, List<string>> arg1,
-                    in Result<TArg2, List<string>> arg2,
-                    in Result<TArg3, List<string>> arg3)
-                {
-                    if (arg1.IsOk() && arg2.IsOk() && arg3.IsOk())
-                        return create(arg1.Ok, arg2.Ok, arg3.Ok);
-
-                    throw new InvalidOperationException();
-                }
-
                 var firstPropValue = "someValue";
                 var secondPropValue = "someOtherValue";
                 var thirdPropValue = "yetAnotherValue";
@@ -154,17 +112,16 @@ namespace SValid.Benchmark
                     & thirdPropValue.MinLength(3)
                     & thirdPropValue.MaxLength(100);
 
-                return CreateValidated(
+                return ValidationUtils.CreateValidated(
                     (a1, a2, a3) => new SimpleClass(a1, a2, a3),
-                    validatedFirstProp,
-                    validatedSecondProp,
-                    validatedThirdProp);
+                    nameof(validatedFirstProp), validatedFirstProp,
+                    nameof(validatedSecondProp), validatedSecondProp,
+                    nameof(validatedThirdProp), validatedThirdProp).Ok;
             }
 
             [Benchmark]
             public SimpleClass OutChaining()
             {
-
                 var firstPropValue = "someValue";
                 var secondPropValue = "someOtherValue";
                 var thirdPropValue = "yetAnotherValue";

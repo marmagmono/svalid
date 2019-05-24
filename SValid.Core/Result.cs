@@ -1,20 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace SValid.Core
 {
     public enum ResultTag { Ok, Error }
 
-    public readonly struct Result<TOk, TError>
+    public readonly struct Result<TOk>
     {
         public readonly ResultTag Outcome;
 
         public readonly TOk Ok;
 
-        public readonly TError Error;
+        public readonly ErrorData Error;
 
-        private Result(ResultTag outcome, in TOk ok, in TError error)
+        private Result(ResultTag outcome, in TOk ok, in ErrorData error)
         {
             Outcome = outcome;
             Ok = ok;
@@ -22,45 +20,25 @@ namespace SValid.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Result<TOk, TError> CreateOk(in TOk ok) =>
-            new Result<TOk, TError>(ResultTag.Ok, ok, default);
+        public static Result<TOk> CreateOk(in TOk ok) =>
+            new Result<TOk>(ResultTag.Ok, ok, default);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Result<TOk, TError> CreateError(in TError error) =>
-            new Result<TOk, TError>(ResultTag.Error, default, error);
+        public static Result<TOk> CreateError(in ErrorData error) =>
+            new Result<TOk>(ResultTag.Error, default, error);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Result<TOk, List<TError>>(in Result<TOk, TError> res) =>
-            res.IsOk() ?
-                Result<TOk, List<TError>>.CreateOk(res.Ok)
-                : Result<TOk, List<TError>>.CreateError(new List<TError>() { res.Error });
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Result<TOk, List<TError>> operator&(
-            in Result<TOk, TError> res1,
-            in Result<TOk, TError> res2)
-        {
-            if (res1.IsOk() && res2.IsOk())
-                return Result<TOk, List<TError>>.CreateOk(res1.Ok);
-            else if (res1.IsOk() && res2.IsError())
-                return Result<TOk, List<TError>>.CreateError(new List<TError>() { res2.Error });
-            else if (res1.IsError() && res2.IsOk())
-                return Result<TOk, List<TError>>.CreateError(new List<TError>() { res1.Error });
-            else return Result<TOk, List<TError>>.CreateError(new List<TError>() { res1.Error, res2.Error });
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Result<TOk, List<TError>> operator&(
-            in Result<TOk, List<TError>> res1,
-            in Result<TOk, TError> res2)
+        public static Result<TOk> operator&(
+            in Result<TOk> res1,
+            in Result<TOk> res2)
         {
             if (res1.IsOk() && res2.IsOk())
                 return res1;
             else if (res1.IsOk() && res2.IsError())
-                return Result<TOk, List<TError>>.CreateError(new List<TError>() { res2.Error });
+                return res2;
             else if (res1.IsError() && res2.IsOk())
-                return Result<TOk, List<TError>>.CreateError(new List<TError>(res1.Error));
-            else return Result<TOk, List<TError>>.CreateError(new List<TError>(res1.Error) { res2.Error });
+                return res1;
+            else return CreateError(res1.Error.Merge(res2.Error));
         }
     }
 }

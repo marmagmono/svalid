@@ -6,7 +6,7 @@ using Xunit;
 
 namespace SValid.Core.Tests.StringValidation
 {
-    using StringValidationResult = Result<string, string>;
+    using StringValidationResult = Result<string>;
 
     public class StringValidationExtensionsFacts
     {
@@ -38,7 +38,7 @@ namespace SValid.Core.Tests.StringValidation
 
             // Assert
             Assert.True(res.IsError());
-            Assert.Equal(StringValidationExtensions.EmptyErrorCode, res.Error);
+            AssertSingleError(StringValidationExtensions.EmptyErrorCode, res.Error);
         }
 
         [Theory]
@@ -69,7 +69,7 @@ namespace SValid.Core.Tests.StringValidation
 
             // Assert
             Assert.True(res.IsError());
-            Assert.Equal(StringValidationExtensions.TooShortErrorCode, res.Error);
+            AssertSingleError(StringValidationExtensions.TooShortErrorCode, res.Error);
         }
 
         [Theory]
@@ -100,7 +100,7 @@ namespace SValid.Core.Tests.StringValidation
 
             // Assert
             Assert.True(res.IsError());
-            Assert.Equal(StringValidationExtensions.TooLongErrorCode, res.Error);
+            AssertSingleError(StringValidationExtensions.TooLongErrorCode, res.Error);
         }
 
         [Theory]
@@ -135,7 +135,7 @@ namespace SValid.Core.Tests.StringValidation
 
             // Assert
             Assert.True(res.IsError());
-            Assert.Equal(StringValidationExtensions.InvalidLengthErrorCode, res.Error);
+            AssertSingleError(StringValidationExtensions.InvalidLengthErrorCode, res.Error);
         }
 
         [Theory]
@@ -164,7 +164,14 @@ namespace SValid.Core.Tests.StringValidation
 
             // Assert
             Assert.True(res.IsError());
-            Assert.Equal(string.Format(StringValidationExtensions.NoMatchErrorCode, pattern), res.Error);
+            AssertSingleError(string.Format(StringValidationExtensions.NoMatchErrorCode, pattern), res.Error);
+        }
+
+        private void AssertSingleError(string errorCode, ErrorData errorData)
+        {
+            SingleError se = errorData as SingleError;
+            Assert.NotNull(se);
+            Assert.Equal(errorCode, se.ErrorCode);
         }
     }
 }

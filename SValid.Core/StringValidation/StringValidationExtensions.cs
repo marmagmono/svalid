@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace SValid.Core.StringValidation
 {
-    using StringValidationResult = Result<string, string>;
+    using StringValidationResult = Result<string>;
 
     public static class StringValidationExtensions
     {
@@ -19,7 +19,7 @@ namespace SValid.Core.StringValidation
             string errorCode = EmptyErrorCode)
         {
             return string.IsNullOrEmpty(s) ?
-                StringValidationResult.CreateError(errorCode)
+                StringValidationResult.CreateError(ErrorData.SingleError(errorCode))
                 : StringValidationResult.CreateOk(s);
         }
 
@@ -30,7 +30,7 @@ namespace SValid.Core.StringValidation
             string errorCode = TooShortErrorCode)
         {
             return s?.Length < minLength ?
-                StringValidationResult.CreateError(errorCode)
+                StringValidationResult.CreateError(ErrorData.SingleError(errorCode))
                 : StringValidationResult.CreateOk(s);
         }
 
@@ -39,9 +39,9 @@ namespace SValid.Core.StringValidation
             this string s,
             uint maxLength,
             string errorCode = TooLongErrorCode)
-                {
+        {
             return s?.Length > maxLength ?
-                StringValidationResult.CreateError(errorCode)
+                StringValidationResult.CreateError(ErrorData.SingleError(errorCode))
                 : StringValidationResult.CreateOk(s);
         }
 
@@ -53,7 +53,7 @@ namespace SValid.Core.StringValidation
             string errorCode = InvalidLengthErrorCode)
         {
             return s?.Length > maxLength || s?.Length < minLength ?
-                StringValidationResult.CreateError(errorCode)
+                StringValidationResult.CreateError(ErrorData.SingleError(errorCode))
                 : StringValidationResult.CreateOk(s);
         }
 
@@ -65,7 +65,7 @@ namespace SValid.Core.StringValidation
             var m = Regex.Match(s, regExp);
             return m.Success ?
                 StringValidationResult.CreateOk(s)
-                : StringValidationResult.CreateError(string.Format(errorCodeTemplate, regExp));
+                : StringValidationResult.CreateError(ErrorData.SingleError(string.Format(errorCodeTemplate, regExp)));
         }
     }
 }
